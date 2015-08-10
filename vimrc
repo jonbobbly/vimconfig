@@ -18,7 +18,7 @@ set listchars=tab:>-,trail:- "what's display when :set list
 set backspace=indent,eol,start
 syntax on     "syntax highlighting
 "colors
-colo slate
+colo my_slate
 hi StatusLine ctermfg=gray ctermbg=black
 hi LineNr ctermfg=blue | "Line numbers are blue
 hi ColorColumn ctermbg=darkgrey ctermfg=red
@@ -30,7 +30,7 @@ map ,sl :set list!<CR>
 map ,sn :set number!<CR>
 map ,sr :set rnu!<CR>
 "Date/Time
-map <F4> "=strftime("%Y/%m/%d %H:%M:%S")<CR>p
+map <F4> "=strftime("%Y-%m-%d %H:%M:%S")<CR>p
 "ASCII Related
 map <F5> <ESC>:call Hr()<CR>
 map ,h1 yypVr=
