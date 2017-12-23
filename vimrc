@@ -1,73 +1,81 @@
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"  Pathogen init
+"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 execute pathogen#infect()
-filetype plugin on
-let g:task_rc_override = 'rc.defaultwidth=999'
+call pathogen#helptags()
+filetype plugin indent on
 
-" General settings
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"  Appearance settings
+"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+syntax on
 set nocompatible  "Compatible schmapatible.
 set showmode      "Show --Insert-- etc.
 set showcmd       "Show typed commands
-set nowrap        "Don't wrap long lines
+set nowrap
 set incsearch     "Incremental search. Fantastic
 set stl=%f\ %m\ %r\ Line:\ %l/%L[%p%%]\ Col:\ %c\ [%v]
 set laststatus=2  "Always display status line
 set ch=2          "lines for command-line
 set ai            "turn on auto indent
 set fo=w2tq       "format options
-set listchars=tab:>-,trail:- "what's display when :set list
+set listchars=tab:>-,trail:- "what's displayed when :set list
 set backspace=indent,eol,start
-syntax on     "syntax highlighting
-"colors
-colo my_slate
-hi StatusLine ctermfg=gray ctermbg=black
-hi LineNr ctermfg=blue | "Line numbers are blue
-hi ColorColumn ctermbg=darkgrey ctermfg=red
+set foldmethod=marker
+set foldtext=CustomFoldText()
 
-vnoremap ;bc "ey:call CalcBC()<CR>
-map ,ref :e ~/.vim/info/reference.txt<CR>
-"Numbering Commands
-map ,sl :set list!<CR>
-map ,sn :set number!<CR>
-map ,sr :set rnu!<CR>
-"Date/Time
-map <F4> "=strftime("%Y-%m-%d %H:%M:%S")<CR>p
-"ASCII Related
-map <F5> <ESC>:call Hr()<CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"  Dealing with vimturds
+"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set dir=~/vimswap//
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"  Colors
+"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function s:fix_colors()
+	hi StatusLine ctermfg=gray ctermbg=black
+	hi LineNr ctermfg=blue 
+endfunction
+autocmd! ColorScheme my_slate call s:fix_colors()
+colorscheme my_slate
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"  Simple Mappings
+"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 map ,h1 yypVr=
 map ,h2 yypVr-
 map ,h3 I=<ESC>A=<ESC>
 map ,h4 I-<ESC>A-<ESC>
+map ,sl :set list!<CR>
+map ,sn :set number!<CR>
 map ,sp :s/\p/& /g<CR>$x
-"For use with ~/.vim/sessions/ascii.vim
-map _ascii :so ~/.vim/sessions/ascii.vim<CR>
-map _gtd :so ~/.vim/sessions/gtd.vim<CR>
-map _notes :call NoteSplit()<CR>
-"Unmapping annoyances
-imap <C-p> <esc>
-"gnuplot
+map ,sr :set rnu!<CR>
 map <F2> :silent !gnuplot %<CR>:redraw!<CR>
-"word count
-map <F3> :s/\i\+/&/gn<CR>
-"sort entries in LaTeX dictionary
-map ,ds :sort /.\{-}\ze\}/ r<CR>
-"spelling
+map <F4> "=strftime("%Y-%m-%d %H:%M:%S")<CR>p
 map <F6> :silent !pdflatex %<CR>:redraw!<CR>
 map <F7> :setlocal spell! spelllang=en_us<CR>
-
-map ,j {!}par -jw60<CR>
-
-map ,b ggVGd:re !ledger -f bells.dat bal assets liab<CR>o<CR><ESC>:re !ledger -f bells.dat --invert -p today bal income expenses<CR>
-
-"working with folds
-set foldmethod=marker
-set foldtext=CustomFoldText()
-
-"nerd tree toggle
-map <C-n> :NERDTreeToggle<CR>
+nmap ,ml Go<ESC>60i_<ESC>o vim:tw=60<ESC>:w<CR>:e<CR>
+nnoremap <Leader>p :set paste<CR>o<esc>"*p<esc>:set nopaste<cr>
+"Unmapping annoyances
+imap <C-p> <esc>
 
 
-" Functions
-
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"  Functions
+"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"  Horizontal Rule
+map <F5> <ESC>:call Hr()<CR>
 function Hr (...)
   if a:0>0          
     let char=a:1   
@@ -88,43 +96,64 @@ function Hr (...)
   call setline(".",str)
 endfunction
 
-"http://www.gregsexton.org/2011/03/improving-the-text-displayed-in-a-fold/
-fun! CustomFoldText()
-    "get first non-blank line
-    let fs = v:foldstart
-    while getline(fs) =~ '^\s*$' | let fs = nextnonblank(fs + 1)
-    endwhile
-    if fs > v:foldend
-        let line = getline(v:foldstart)
-	let line = substitute(line, '{', '', 'g') "My addition
-    else
-        let line = substitute(getline(fs), '\t', repeat(' ', &tabstop), 'g')
-	let line = substitute(line, '{', '', 'g') "My addition
-    endif
+"  Live word count
+let g:word_count="<unknown>"
+set statusline+=\ %{WordCount()}\ words
+function! WordCount()
+	return g:word_count
+endfunction
+function! UpdateWordCount()
+	let lnum = 1
+	let n = 0
+	while lnum <= line('$')
+		let n = n + len(split(getline(lnum)))
+		let lnum = lnum + 1
+	endwhile
+	let g:word_count = n
+endfunction
+set updatetime=1000
+augroup WordCounter
+	au! CursorHold,CursorHoldI * call UpdateWordCount()
+augroup END
 
-    let w = winwidth(0) - &foldcolumn - (&number ? 8 : 0)
-    let foldSize = 1 + v:foldend - v:foldstart
-    let foldSizeStr = " " . foldSize . " lines "
-    let foldLevelStr = repeat("+--", v:foldlevel)
-    let lineCount = line("$")
-    let foldPercentage = printf("[%.1f", (foldSize*1.0)/lineCount*100) . "%] "
-    let expansionString = repeat(".", w - strwidth(foldSizeStr.line.foldLevelStr.foldPercentage))
-    return line . expansionString . foldSizeStr . foldPercentage . foldLevelStr
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"  vimwiki
+"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:vimwiki_list = [{'path': '~/vimwiki', 'auto_export': 1}]
+let g:vimwiki_hl_headers = 1
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"  NERD Tree settings
+"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+map <C-n> :NERDTreeToggle<CR>
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"  GoYo -- writeroom-like environment.
+"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+map ,g :Goyo<CR>
+
+let g:goyo_width=62
+let g:goyo_height=30
+
+fun! s:goyo_enter()
+	set scrolloff=999
+	set tw=60
+	if exists('$TMUX')
+		silent !tmux set status off
+	endif
 endf
-
-fun! NoteSplit()
-	NERDTreeToggle
-	vertical resize 50
-	wincmd l
-	vsplit
-	exe 3 . "wincmd w"
-	vertical resize 70
-	split
-	set number
-	wincmd j
-	resize 15
-	TW
-	exe 2 . "wincmd w"
-	set number
-
+fun! s:goyo_leave()
+	set scrolloff=0
+	if exists('$TMUX')
+		silent !tmux set status on
+	endif
+	colorscheme my_slate
 endf
+autocmd! User GoyoEnter nested call <SID>goyo_enter()
+autocmd! User GoyoLeave nested call <SID>goyo_leave()
