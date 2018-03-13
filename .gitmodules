@@ -1,0 +1,6 @@
+[submodule "pack/bobbly/start/nerdtree"]
+	path = pack/bobbly/start/nerdtree
+	url = https://scrooloose/nerdtree
+[submodule "pack/bobbly/start/goyo.vim"]
+	path = pack/bobbly/start/goyo.vim
+	url = https://github.com/junegunn/goyo.vim
