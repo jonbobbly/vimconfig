@@ -1,9 +1,3 @@
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"  Pathogen init
-"
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-execute pathogen#infect()
-call pathogen#helptags()
 filetype plugin indent on
 
 
@@ -115,14 +109,6 @@ set updatetime=1000
 augroup WordCounter
 	au! CursorHold,CursorHoldI * call UpdateWordCount()
 augroup END
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"  vimwiki
-"
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:vimwiki_list = [{'path': '~/vimwiki', 'auto_export': 1}]
-let g:vimwiki_hl_headers = 1
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""

@@ -1,2 +1,0 @@
-Digraphs	~/.vim/info/digraphs.txt
-Mappings	~/.vim/info/mappings.txt
