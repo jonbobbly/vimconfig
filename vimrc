@@ -40,6 +40,7 @@ function s:fix_colors()
 endfunction
 autocmd! ColorScheme my_slate call s:fix_colors()
 colorscheme my_slate
+hi! Folded ctermbg=black
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""

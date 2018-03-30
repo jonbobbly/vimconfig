@@ -4,3 +4,6 @@
 [submodule "pack/bobbly/start/goyo.vim"]
 	path = pack/bobbly/start/goyo.vim
 	url = https://github.com/junegunn/goyo.vim
+[submodule "pack/bobbly/start/vimoutliner"]
+	path = pack/bobbly/start/vimoutliner
+	url = https://github.com/vimoutliner/vimoutliner.git
